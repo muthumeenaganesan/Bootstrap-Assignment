@@ -1,0 +1,13 @@
+.browser-alert{display:none;padding:80px 0;max-width:1250px;font-family:FordAntennaExtraLight,AntennaExtraLight,fordngbs-antenna,AntennaRE,arial,helvetica,sans-serif;color:#616161;text-align:center;background:#FFF}
+.browser-alert a.icon-close{font-size:60px;position:absolute;top:15px;right:15px}
+.browser-alert .logo{margin:20px 0 0 0;padding:0 0 20px 0;max-width:130px}
+.browser-alert h1{gin:20px 0}
+.browser-alert p{font-size:21px;margin:0 50px 55px 50px}
+.browser-alert .browser-list{margin:0 auto;width:510px}
+.browser-alert .browser-list a{display:block;float:left;margin:23px;padding:70px 0 0 0;width:80px;font-size:16px;color:#616161;text-align:center;text-decoration:none;background:url(../../../../../content/dam/fordweb/general-assets/unsupported-browser/browser_logos-desktophidef.png) no-repeat}
+.browser-alert .browser-list .firefox{background-position:0 0}
+.browser-alert .browser-list .chrome{background-position:-80px 0}
+.browser-alert .browser-list .safari{background-position:-160px 0}
+.browser-alert .browser-list .ie{background-position:-240px 0}
+.mobile-wrapper .browser-alert .browser-list{width:auto;max-width:280px}
+.ui-widget-overlay{background:#000 none;-ms-filter:"alpha(opacity=70)";filter:alpha(opacity=70);-moz-opacity:.7;-khtml-opacity:.7;opacity:.7}

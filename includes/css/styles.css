@@ -1,0 +1,157 @@
+/*
+
+My Custom CSS
+=============
+
+Author:  Brad Hussey
+Updated: August 2013
+Notes:	 Hand coded for Udemy.com
+
+*/
+
+
+/* --------------------------------------
+   Layout
+   -------------------------------------- */
+
+
+
+
+
+
+
+   #myCarousel
+   {
+     margin-top:100px;
+   }
+
+  #features{
+    text-align:center;
+  }
+  #features img{
+    margin:0px 0px 20px;
+  }
+
+
+   footer {
+   	background: #333;
+   	color: #eee;
+   	font-size: 11px;
+   	padding: 20px;
+   }
+   #inputMessage {
+    margin-bottom: 15px;
+   }
+
+
+
+
+/* --------------------------------------
+   Typography
+   -------------------------------------- */
+   body {
+   	-webkit-font-smoothing: antialiased;
+   	text-rendering: optimizelegibility;
+    margin: auto;
+    overflow-x: hidden;
+   }
+
+
+   ul.unstyled {
+     list-style:none;
+     padding:0;
+   }
+
+/* --------------------------------------
+   Navbar
+   -------------------------------------- */
+   .navbarfixed-top {
+     width:1440px;
+     height:80;
+   }
+   .navbar img{
+     height:60px;
+     width:140px;
+   }
+
+   #link1 a-hover{
+     text-decoration: underline;
+   }
+   #searchInput {
+     	width: 200px;
+      margin-top:0px;
+   }
+
+
+   .navbar-brand {
+   	padding: 13px 15px;
+   }
+
+
+
+
+
+/* --------------------------------------
+   Carousel
+   -------------------------------------- */
+
+@media  screen and  (min-width:37.4em){
+    .as{
+  width:100%;
+}
+
+
+
+
+
+}
+@media  screen and  (max-width:37.5em){
+  .as
+  {
+    width:100%;
+  }
+
+
+
+
+
+
+
+
+/* --------------------------------------
+   Global Styles
+   -------------------------------------- */
+   .thumbnails {
+    margin: 20px 0;
+   }
+
+   .thumbnail {
+    position: relative;
+   }
+
+   #cars h2{
+     color:black;
+     font-family:sans-serif;
+   }
+   #cars p{
+     color: black;
+   font-family: initial;
+   font-size: large;
+        }
+
+  #brief p{
+    color: black;
+   font-family: initial;
+   font-size: large;
+  }
+
+
+
+
+
+
+/* --------------------------------------
+   Media Queries
+   -------------------------------------- */
+
+   /* Portrait & landscape phone */

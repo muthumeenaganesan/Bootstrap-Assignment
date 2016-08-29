@@ -1,0 +1,464 @@
+if (window.XDomainRequest) {
+    jQuery.ajaxTransport(function (s) {
+        if (s.crossDomain && s.async) {
+            if (s.timeout) {
+                s.xdrTimeout = s.timeout;
+                delete s.timeout;
+            }
+            var xdr;
+            return {
+                send: function (_, complete) {
+                    function callback(status, statusText, responses, responseHeaders) {
+                        xdr.onload = xdr.onerror = xdr.ontimeout = jQuery.noop;
+                        xdr = undefined;
+                        complete(status, statusText, responses, responseHeaders);
+                    }
+                    xdr = new XDomainRequest();
+                    xdr.onload = function () {
+                        callback(200, "OK", { text: xdr.responseText }, "Content-Type: " + xdr.contentType);
+                    };
+                    xdr.onerror = function () {
+                        callback(404, "Not Found");
+                    };
+                    xdr.onprogress = jQuery.noop;
+                    xdr.ontimeout = function () {
+                        callback(0, "timeout");
+                    };
+                    xdr.timeout = s.xdrTimeout || Number.MAX_VALUE;
+                    xdr.open(s.type, s.url);
+                    xdr.send((s.hasContent && s.data) || null);
+                },
+                abort: function () {
+                    if (xdr) {
+                        xdr.onerror = jQuery.noop;
+                        xdr.abort();
+                    }
+                }
+            };
+        }
+    });
+}
+
+(function () {
+    var tagBrand = 'Ford';
+    var tagCountry = 'USA';
+    var cookieDaysToLive = 90;
+    var now = new Date();
+
+    var PERSONALIZATION = {
+        config: {
+            path: ''
+        },
+        cookie: {
+            domain: (function () {
+                var i = 0, domain = document.domain, p = domain.split('.'), s = '_gd' + now.getTime();
+                while (i < (p.length - 1) && document.cookie.indexOf(s + '=' + s) == -1) {
+                    domain = p.slice(-1 - (++i)).join('.');
+                    document.cookie = s + "=" + s + ";domain=" + domain + ";";
+                }
+                document.cookie = s + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;domain=" + domain + ";";
+                return domain;
+            })(),
+            set: function(sKey, sValue, vEnd, sPath, sDomain, bSecure) {
+                if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) { return false; }
+                var sExpires = "";
+                if (vEnd) {
+                    switch (vEnd.constructor) {
+                        case Number:
+                            sExpires = vEnd === Infinity ? "; expires=Fri, 31 Dec 9999 23:59:59 GMT" : "; max-age=" + vEnd;
+                            break;
+                        case String:
+                            sExpires = "; expires=" + vEnd;
+                            break;
+                        case Date:
+                            sExpires = "; expires=" + vEnd.toUTCString();
+                            break;
+                    }
+                }
+                document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
+                return true;
+            },
+            get: function(name) {
+                var nameEQ = name + "=";
+                var ca = document.cookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            }
+        },
+        djb2: function(str) {
+            var hash = 5381;
+            for (i = 0; i < str.length; i++) {
+                c = str.charCodeAt(i);
+                hash = ((hash << 5) + hash) + c;
+            }
+            return hash;
+        },
+        lib: {
+            ExternalRef: function (type, id) {
+                return { 'ExternalRef': { _type: type, id: PERSONALIZATION.djb2(id) } };
+            }
+        },
+        reservedProperties: ['metadata', 'reservedKey', 'trueKey', 'params', 'match', 'suffix', 'query'],
+        stringifyEach: function (keyValueObjects) {
+            if (jQuery.isArray(keyValueObjects)) {
+                jQuery.each(keyValueObjects, function (index, keyValueObject) {
+                    for (var key in keyValueObject) { 
+                        keyValueObject[key] = JSON.stringify(keyValueObject[key]);
+                    }
+                });
+            }
+
+            return keyValueObjects;
+        },
+        set: function (entries, _timeout) {
+            var config = {
+                url: PERSONALIZATION.config.path + '/api/personalization/set',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json; charset=UTF-8',
+                timeout: (jQuery.type(_timeout) === "number") ? _timeout : 5000
+            };
+            config.data = JSON.stringify({ 
+                uid: uid, 
+                tagBrand: tagBrand, 
+                tagCountry: tagCountry, 
+                entries: entries, 
+                referrer: document.referrer,
+                url: document.location.href
+            });
+            
+            var defer = jQuery.ajax(config);
+            return defer;
+        },
+        get: function (keyValueObjects, _timeout, asBrand, asCountry) {
+            var entries = PERSONALIZATION.stringifyEach(keyValueObjects);
+
+            var config = {
+                url: PERSONALIZATION.config.path + '/api/personalization/get?uid=' + uid,
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json; charset=UTF-8',
+                timeout: (jQuery.type(_timeout) === "number") ? _timeout : 3000
+            };
+            config.data = JSON.stringify({ 
+                uid: uid, 
+                entries: entries, 
+                referUrl: document.referrer,
+                tagBrand: asBrand || tagBrand,
+                tagCountry: asCountry || tagCountry
+            });
+
+            var defer = jQuery.ajax(config);
+            return defer;
+        },
+        setExternalRef: function (externalRefEntries, _timeout) {
+            var config = {
+                url: PERSONALIZATION.config.path + '/api/externalref/set',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json; charset=UTF-8',
+                timeout: (jQuery.type(_timeout) === "number") ? _timeout : 5000
+            };
+            config.data = JSON.stringify({ 
+                uid: uid, 
+                tagBrand: tagBrand, 
+                tagCountry: tagCountry, 
+                entries: externalRefEntries, 
+                referUrl: document.referrer
+            });
+
+            var defer = jQuery.ajax(config);
+            return defer;
+        }
+    };
+    
+    var UUIDV4 = function b(a) { return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b) };
+    var uid = PERSONALIZATION.cookie.get('gt_uid') || UUIDV4();
+
+    PERSONALIZATION.cookie.set('gt_uid', uid, new Date(now.getTime() + (cookieDaysToLive * 86400000)), '/', PERSONALIZATION.cookie.domain);
+
+// PROD_NA
+window.FPS = {
+    config: {
+        path: '/fps'
+    },
+    actions: {
+        BPComplete: { name: 'BPComplete', score: '3' },
+        BPStart: { name: 'BPStart', score: '2' },
+        Referral: { name: 'Referral', score: '2' },
+        RequestBrochure: { name: 'RequestBrochure', score: '3' },
+        RequestPaymentEstimate: { name: 'RequestPaymentEstimate', score: '3' },
+        RequestQuickQuote: { name: 'RequestQuickQuote', score: '5' },
+        RequestQuote: { name: 'RequestQuote', score: '4' },
+        RequestUpdates: { name: 'RequestUpdates', score: '5' },
+        ScheduleTestDrive: { name: 'ScheduleTestDrive', score: '4' },
+        SearchDealer: { name: 'SearchDealer', score: '2' },
+        SearchInventory: { name: 'SearchInventory', score: '3' },
+        SearchSite: { name: 'SearchSite', score: '2' },
+        ViewPage: { name: 'ViewPage', score: '1' }
+    },
+    lib: {
+        ActionNameplate: function (year, brand, nameplate, action) {
+            return { 'ActionNameplate': { _year: year, _brand: brand, _nameplate: nameplate }, suffix: action.name, metadata: { score: action.score } };
+        },
+        ActionTrim: function (year, brand, nameplate, trim, action) {
+            return { 'ActionTrim': { _year: year, _brand: brand, _nameplate: nameplate, _trim: trim }, suffix: action.name, metadata: { score: action.score } };
+        },
+        PageVisit: function (omniturePageName) {
+            return { 'PageVisit': { _omniturePageName: omniturePageName } };
+        },
+        PreferredDealer: function (paCode, description) {
+            return { 'PreferredDealer': { _paCode: paCode, description: description } };
+        },
+        UserDefinedLocation: function (name, description) {
+            return { 'UserDefinedLocation': { _name: name, description: description } };
+        },
+        ViewedVehicle: function (year, brand, nameplate, trim) {
+            return { 'ViewedVehicle': { _year: year, _brand: brand, _nameplate: nameplate, _trim: trim } };
+        },
+        Visited: function (url) {
+            return { 'Visited': { _url: url } };
+        }
+    },
+    reserved: {
+        LastViewedVehicle: { reservedKey: 'LastViewedVehicle', trueKey: 'ViewedVehicle', params: { max: 1 } },
+        RecentlyViewedVehicles: { reservedKey: 'RecentlyViewedVehicles', trueKey: 'ViewedVehicle', params: { max: 4 } },
+        VOIAggregateNameplate: { reservedKey: 'VOIAggregateNameplate', trueKey: 'ActionNameplate', params: { query: 'ScoreAggregate:p*', max: 1 } },
+        VOIAggregateTrim: { reservedKey: 'VOIAggregateTrim', trueKey: 'ActionTrim', params: { query: 'ScoreAggregate:p*', max: 1 } },
+        VOISimpleNameplate: { reservedKey: 'VOISimpleNameplate', trueKey: 'ActionNameplate', params: { query: 'Score', max: 1 } },
+        VOISimpleTrim: { reservedKey: 'VOISimpleTrim', trueKey: 'ActionTrim', params: { query: 'Score', max: 1 } }
+    },
+    storageKeyPrefix: 'FPS_Cache__',
+    storageKey: function (reservedKey) {
+        return FPS.storageKeyPrefix + reservedKey;
+    },
+    fpsKey: function (fpsObject) {
+        for (key in fpsObject) {
+            if (jQuery.inArray(key, PERSONALIZATION.reservedProperties) < 0) {
+                return key;
+            }
+        }
+        return null;
+    },
+    get: function (keyValueObjects, callbacks, asBrand, asCountry) {
+        if (callbacks && callbacks.success && callbacks.error) {
+            var entries = [];
+            var newEntry;
+            var inStorage = [];
+            var getAs = (asBrand !== undefined) && (asCountry !== undefined);
+            var reservedObject = undefined;
+            var indices = {};
+            var newIndex = 0;
+            var extract = function (data) {
+                var extracted = [];
+                if (data) {
+                    jQuery.each(data, function (index, kvPair) {
+                        var formattedObject = new Object();
+                        formattedObject[kvPair['Key']] = kvPair['Value'];
+                        extracted.push(formattedObject);
+                    });
+                }
+                return extracted;
+            };
+            var complete = function (success, callbacks, data) {
+                var jqDef = new $.Deferred();
+                var jqXHR = jqDef.promise();
+
+                jqXHR.success = jqXHR.done;
+                jqXHR.error = jqXHR.fail;
+
+                var s = $.ajaxSetup({}, {});
+                var callbackContext = s.context || s;
+
+                jqXHR.readyState = success ? 4 : 0;
+                jqXHR.status = success ? 200 : 0;
+                jqXHR.statusText = success ? 'OK' : 'error';
+                jqXHR.responseJSON = data;
+                jqXHR.responseText = JSON.stringify(data);
+
+                jqXHR.success(function (data, statusText, jqXHR) {
+                    callbacks.success(extract(data), statusText, jqXHR);
+                });
+
+                jqDef.resolveWith(callbackContext, [data, success ? 'success' : 'error', jqXHR]);
+
+                return jqXHR;
+            };
+            var serialize = function (obj) {
+                var str = [];
+                jQuery.each(obj, function (index, item) {
+                    for (var p in item) {
+                        var k = p.indexOf('_') === 0 ? p.substr(1) : p;
+                        str.push(k + "=" + item[p]);
+                    }
+                });
+                return str.join("&");
+            };
+            var setTargetCookie = function (kvPair) {
+                if (kvPair.Key === 'VOIAggregateNameplate') {
+                    PERSONALIZATION.cookie.set('FPS_Target', serialize(kvPair.Value), new Date(now.getTime() + (90 * 86400000)), '/', PERSONALIZATION.cookie.domain);
+                }
+            };
+
+            jQuery.each(keyValueObjects, function (index, keyValueObject) {
+                var fpsKey;
+                var storageValue;
+
+                if (keyValueObject.hasOwnProperty('match')) {
+                    fpsKey = FPS.fpsKey(keyValueObject['match']);
+                    newEntry = {
+                        key: 'match',
+                        value: keyValueObject['match'],
+                        suffix: keyValueObject['match']['suffix'],
+                        query: keyValueObject.hasOwnProperty('query') ? keyValueObject['query'] : ''
+                    };
+                }
+                else if (keyValueObject.hasOwnProperty('reservedKey')) {
+                    fpsKey = keyValueObject['reservedKey'];
+                    newEntry ={
+                        key: keyValueObject['trueKey'],
+                        value: keyValueObject['params'],
+                        reservedKey: fpsKey
+                    };
+                }
+                else {
+                    fpsKey = FPS.fpsKey(keyValueObject);
+                    reservedObject = FPS.reserved[fpsKey];
+                    if (reservedObject) {
+                        newEntry = {
+                            key: reservedObject['trueKey'],
+                            value: reservedObject['params'],
+                            reservedKey: fpsKey
+                        };
+                    }
+                    else {
+                        newEntry = {
+                            key: fpsKey,
+                            value: keyValueObject[fpsKey],
+                            suffix: keyValueObject['suffix']
+                        };
+                    }
+                }
+
+                if (!indices.hasOwnProperty(fpsKey)) {
+                    indices[fpsKey] = newIndex;
+                    ++newIndex;
+                }
+                if (newEntry['reservedKey'] && !getAs && sessionStorage) {
+                    storageValue = sessionStorage.getItem(FPS.storageKey(newEntry['reservedKey']));
+                }
+                if (storageValue) {
+                    inStorage.push({
+                        Key: newEntry['reservedKey'],
+                        Value: JSON.parse(storageValue)
+                    });
+                }
+                else {
+                    entries.push(newEntry);
+                }
+            });
+
+            if (entries.length === 0 && inStorage.length > 0) {
+                complete(true, callbacks, inStorage);
+            }
+            else {
+                jQuery.extend(PERSONALIZATION.config, FPS.config);
+                PERSONALIZATION.get(entries, callbacks.timeout, asBrand, asCountry).done(function (data, statusText, jqXHR) {
+                    var combined = [];
+                    jQuery.each(data, function (index, kvPair) {
+                        if (!getAs && sessionStorage) {
+                            if (FPS.reserved.hasOwnProperty(kvPair.Key)) {
+                                sessionStorage.setItem(FPS.storageKey(kvPair.Key), JSON.stringify(kvPair.Value));
+                                setTargetCookie(kvPair);
+                            }
+                        }
+                        combined[indices[kvPair.Key]] = kvPair;
+                    });
+                    jQuery.each(inStorage, function (index, kvPair) {
+                        combined[indices[kvPair.Key]] = kvPair;
+                    });
+                    callbacks.success(extract(combined), statusText, jqXHR);
+                }).fail(function (jqXHR, statusText, error) {
+                    callbacks.error(jqXHR, statusText, error);
+                });
+            }
+        }
+    },
+    set: function (keyValueObjects, callbacks) {
+        var entries = [];
+        jQuery.each(PERSONALIZATION.stringifyEach(keyValueObjects), function (index, keyValueObject) {
+            var reservedKey;
+            var fpsKey = FPS.fpsKey(keyValueObject);
+            if (fpsKey) {
+                entries.push({
+                    key: fpsKey,
+                    value: keyValueObject[fpsKey],
+                    metadata: keyValueObject['metadata'],
+                    suffix: keyValueObject['suffix']
+                });
+
+                if (sessionStorage) {
+                    for (reservedKey in FPS.reserved) {
+                        if (FPS.reserved[reservedKey]['trueKey'] === fpsKey) {
+                            sessionStorage.removeItem(FPS.storageKey(reservedKey));
+                        }
+                    }
+                }
+            }
+        });
+
+        jQuery.extend(PERSONALIZATION.config, FPS.config);
+        if (callbacks && callbacks.success && callbacks.error) {
+            PERSONALIZATION.set(entries, callbacks.timeout).done(function (data, statusText, jqXHR) {
+                callbacks.success(data, statusText, jqXHR);
+            }).fail(function (jqXHR, statusText, error) {
+                callbacks.error(jqXHR, statusText, error);
+            });
+        }
+        else {
+            PERSONALIZATION.set(entries).done(function (data, statusText, jqXHR) {
+            });
+        }
+    },
+    getAll: function (callbacks) {
+        FPS.get([
+            { 'Visited': { max: 1 } },
+            { 'UserDefinedLocation': { max: 1 } },
+            FPS.reserved.RecentlyViewedVehicles,
+            { 'PreferredDealer': { max: 10 } },
+            FPS.reserved.LastViewedVehicle
+        ], callbacks);
+    },
+    setExternalRef: function (type, id, callbacks) {
+        if (type && id && callbacks && callbacks.success && callbacks.error) {
+            jQuery.extend(PERSONALIZATION.config, FPS.config);
+            PERSONALIZATION.setExternalRef([{ key: 'ExternalRef', value: JSON.stringify(PERSONALIZATION.lib.ExternalRef(type, id)['ExternalRef']) }], callbacks.timeout).done(function (data, statusText, jqXHR) {
+                if (data && data.uid_submitted && data.uid_reconciled) {
+                    if (data.uid_submitted !== data.uid_reconciled) {
+                        uid = data.uid_reconciled;
+                        PERSONALIZATION.cookie.set('gt_uid', uid, new Date(now.getTime() + (cookieDaysToLive * 86400000)), '/', PERSONALIZATION.cookie.domain);
+
+                        if (sessionStorage) {
+                            for (sessionKey in sessionStorage) {
+                                if (sessionKey.slice(0, FPS.storageKeyPrefix.length) === FPS.storageKeyPrefix) {
+                                    sessionStorage.removeItem(sessionKey);
+                                }
+                            }
+                        }
+                    }
+                }
+                callbacks.success(data, statusText, jqXHR);
+            }).fail(function (jqXHR, statusText, error) {
+                callbacks.error(jqXHR, statusText, error);
+            });
+        }
+    }
+};
+
+//SNS
+//SAV
+}());

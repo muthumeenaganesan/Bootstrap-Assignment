@@ -1,0 +1,36 @@
+
+<!-- saved from url=(0072)https://cti.w55c.net/ct/dx_upx_v4oiuu2mo3su.html?cp0=&cp1=bhp&cp2=fvflup -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <script src="./cookie-pixel-lib.js"> </script>
+  <script type="text/javascript">
+
+  var dxUpx = function dxUpx(){
+    var prmarr = window.location.search.substr(1).split("&");
+    var dx_params = {};
+    for ( var i = 0; i < prmarr.length; i++) {
+      var tmparr = prmarr[i].split("=");
+      dx_params[tmparr[0]] = tmparr[1];
+    }
+
+    dxCookie = getCookie('wfivefivec');
+    if (dxCookie == null){
+      dxCookie = setDxCookie();
+    }
+
+    var serviceParams = "w55c=" + dxCookie;
+    serviceParams += "&nameplate=" + dx_params['cp0'];
+    serviceParams += "&action=" + dx_params['cp1'];
+    serviceParams += "&tier=" + dx_params['cp2'];
+    serviceParams += "&calling_url=" + document.referrer;
+
+    var endpoint = 'https://ust-servlet.dataxu.net/fordustservlet';
+
+    callPixelService( endpoint, serviceParams );
+  };
+
+  dxUpx();
+
+</script>
+</head><body>
+
+</body></html>

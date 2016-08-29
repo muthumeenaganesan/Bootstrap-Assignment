@@ -1,0 +1,190 @@
+/* CONTAINER */
+#view-container {
+  position: relative;
+  padding: 0;
+  max-width: 1400px;
+  min-width: 960px;
+}
+/* MOBILE CONTAINER */
+.mobile-wrapper #view-container {
+  max-width: 100%;
+  min-width: 100%;
+}
+/* DESKTOP */
+#header {
+  min-width: 960px;
+}
+#header * {
+  box-sizing: content-box;
+}
+#header div.image {
+  margin-bottom: 0;
+}
+#header h4.name,
+#header .owners h1 {
+  font-family: fordngbs-antenna, Fordngbs-antenna, FordAntenna, Antenna, Arial;
+}
+#header sup {
+  line-height: normal;
+  top: 0;
+}
+.global-footer {
+  position: relative;
+  min-width: 960px;
+  z-index: 30;
+  background: #FFF;
+}
+#global-nav .top-links {
+  margin-bottom: 0;
+}
+#global-nav ul.vehicles,
+#global-nav ul.links {
+  margin-bottom: 0;
+}
+#global-nav .vehicle h4 {
+  margin-top: 0;
+}
+#global-nav .vehicle .name {
+  margin-top: 1px;
+  font-family: fordngbs-antenna-bold, Fordngbs-antenna-bold, FordAntennaBold, Antenna, Arial;
+}
+#global-nav .vehicle .item.pricing-plan {
+  margin-top: 1px;
+}
+#global-nav .vehicle a.bp {
+  height: auto;
+}
+#global-nav .bottom .links .link {
+  padding-bottom: 14px;
+}
+/* MOBILE */
+.mobile-wrapper {
+  min-width: 320px;
+  max-width: 767px;
+}
+.mobile-wrapper header.main > h1 {
+  margin: 0;
+}
+.mobile-wrapper #menu-flyout h4 {
+  margin: 0;
+}
+.mobile-wrapper #footer {
+  padding-bottom: 0px;
+  z-index: initial;
+}
+.mobile-wrapper #footer .global-large-menu.blue sup {
+  vertical-align: middle;
+}
+.mobile-wrapper #footer .lower-footer ul {
+  margin: 0;
+}
+.mobile-wrapper #footer .lower-footer * {
+  font-family: arial;
+}
+/*.mobile {
+  #dimContainer, .fm-overlay {
+    z-index: 200;
+  }
+}*/
+#footer,
+#brandfooter,
+#disclaimer {
+  max-width: 1400px;
+  margin: auto;
+}
+#brandfooter {
+  clear: both;
+  padding-top: 50px;
+  font-family: arial;
+}
+#view-disclaimers {
+  font-family: arial;
+}
+#oo_waypoint_prompt #oo_waypoint_content {
+  width: 100%;
+}
+#oo_waypoint_prompt #oo_waypoint_content a.waypoint_icon {
+  height: 50%;
+}
+.disclaimers #opinionlab {
+  width: 270px;
+}
+#brand-footer {
+  padding-top: 50px;
+}
+.brand-footer .liquidRounding .content,
+.brand-footer ul h3 {
+  font-family: arial;
+  margin: 0;
+}
+.shopping-tools-list ul h3 {
+  font-size: 11.52px;
+}
+.brand-footer ul li h2 {
+  margin: 0 5px 18px 0;
+}
+.shopping-tools-list li.category.first-of-type {
+  width: 164px;
+}
+.shopping-tools-list li.category {
+  width: 162px;
+}
+.brand-footer .links a,
+#footer .global-links a {
+  font-size: 11px;
+  font-family: arial;
+}
+/* GET UPDATES */
+.global-footer #getupdates-flip {
+  z-index: 100;
+}
+#getupdates .tooltip-box:after,
+#getupdates .tooltip-box:before {
+  left: 30%;
+}
+#getupdates-flip {
+  font-family: fordngbs-antenna, FordAntenna, Arial, sans-serif;
+}
+#getupdates-flip * {
+  box-sizing: content-box;
+}
+#getupdates-flip h1 {
+  margin: 0;
+}
+#getupdates-flip h2,
+#getupdates-flip h3 {
+  font-size: 16px;
+  font-weight: bold;
+  font-family: fordngbs-antenna, FordAntenna, Arial, sans-serif;
+}
+#getupdates-flip h3 {
+  font-size: 16px;
+  font-weight: normal;
+  font-family: fordngbs-antenna, FordAntenna, Arial, sans-serif;
+}
+#getupdates-flip label,
+#getupdates-flip .label {
+  font-weight: normal;
+  color: #425968;
+  display: block;
+  text-align: left;
+}
+#getupdates-flip input {
+  height: auto;
+}
+#getupdates-flip .ngbs-select .select-container {
+  overflow: hidden;
+}
+#getupdates-flip .ngbs-select .select-container select {
+  padding: 0 5px;
+}
+/* COMPONENT SPECIFIC */
+.mobile-wrapper .showroom-billboard h6 {
+  display: none;
+}
+/* COMPONENT SPECIFIC */
+@media (min-width: 768px) {
+  #ford-dealer-map {
+    min-width: 960px;
+  }
+}
